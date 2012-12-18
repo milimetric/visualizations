@@ -91,7 +91,7 @@ function SankeyGraph(selector, uri){
     function walkTree(node, nodes, links){
         node.value = node.children ?
             node.children.reduce(function(val, child){ return val + walkTree(child, nodes, links); }, 0) :
-            1;
+            node.value ? node.value : 1;
         
         node.index = nodes.push(node) - 1;
         
