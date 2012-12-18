@@ -1,5 +1,6 @@
 function TreeMapGraph(selector, uri){
-    var color = d3.scale.category20();
+    var color = d3.scale.ordinal()
+        .range(["#2ca02c", "#ff7f0e", "#1f77b4"]);
 
     var margin = {top: 20, right: 0, bottom: 0, left: 0},
         width = 960,
@@ -48,21 +49,22 @@ function TreeMapGraph(selector, uri){
         initialize(root);
         accumulate(root);
         layout(root);
+        colorize(root);
         display(root);
 
         function initialize(root) {
-        root.x = root.y = 0;
-        root.dx = width;
-        root.dy = height;
-        root.depth = 0;
+            root.x = root.y = 0;
+            root.dx = width;
+            root.dy = height;
+            root.depth = 0;
         }
 
         // Aggregate the values for internal nodes. This is normally done by the
         // treemap layout, but not here because of our custom implementation.
         function accumulate(d) {
-        return d.children
-            ? d.value = d.children.reduce(function(p, v) { return p + accumulate(v); }, 0)
-            : d.value;
+            return d.children
+                ? d.value = d.children.reduce(function(p, v) { return p + accumulate(v); }, 0)
+                : d.value;
         }
 
         // Compute the treemap layout recursively such that each group of siblings
@@ -73,91 +75,122 @@ function TreeMapGraph(selector, uri){
         // of sibling was laid out in 1×1, we must rescale to fit using absolute
         // coordinates. This lets us use a viewport to zoom.
         function layout(d) {
-        if (d.children) {
-          treemap.nodes({children: d.children});
-          d.children.forEach(function(c) {
-            c.x = d.x + c.x * d.dx;
-            c.y = d.y + c.y * d.dy;
-            c.dx *= d.dx;
-            c.dy *= d.dy;
-            c.parent = d;
-            layout(c);
-          });
+            if (d.children) {
+                treemap.nodes({children: d.children});
+                d.children.forEach(function(c) {
+                    c.x = d.x + c.x * d.dx;
+                    c.y = d.y + c.y * d.dy;
+                    c.dx *= d.dx;
+                    c.dy *= d.dy;
+                    c.parent = d;
+                    layout(c);
+                });
+            }
         }
+
+        function ColorLuminance(hex, lum) {
+            // validate hex string
+            hex = String(hex).replace(/[^0-9a-f]/gi, '');
+            if (hex.length < 6) {
+                hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+            }
+            lum = lum || 0;
+            // convert to decimal and change luminosity
+            var rgb = "#", c, i;
+            for (i = 0; i < 3; i++) {
+                c = parseInt(hex.substr(i*2,2), 16);
+                c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+                rgb += ("00"+c).substr(c.length);
+            }
+            return rgb;
+        }
+
+        function colorize(d, parentColor) {
+            if (d.children) {
+                lighterBy = 0.10;
+                d.children.forEach(function(c) {
+                    c.color = parentColor ?
+                        ColorLuminance(parentColor, lighterBy) :
+                        color(c.name);
+                    
+                    lighterBy += 0.10;
+                    colorize(c, c.color);
+                });
+            }
         }
 
         function display(d) {
-        grandparent
-            .datum(d.parent)
-            .on("click", transition)
-          .select("text")
-            .text(name(d));
+            grandparent
+                .datum(d.parent)
+                .on("click", transition)
+              .select("text")
+                .text(name(d));
 
-        var g1 = svg.insert("g", ".grandparent")
-            .datum(d)
-            .attr("class", "depth");
+            var g1 = svg.insert("g", ".grandparent")
+                .datum(d)
+                .attr("class", "depth");
 
-        var g = g1.selectAll("g")
-            .data(d.children)
-          .enter().append("g");
+            var g = g1.selectAll("g")
+                .data(d.children)
+              .enter().append("g");
 
-        g.filter(function(d) { return d.children; })
-            .classed("children", true)
-            .on("click", transition);
+            g.filter(function(d) { return d.children; })
+                .classed("children", true)
+                .on("click", transition);
 
-        g.selectAll(".child")
-            .data(function(d) { return d.children || [d]; })
-          .enter().append("rect")
-            .attr("class", "child")
-            .style("fill", function(d) { return color(d.name); })
-            .call(rect);
+            g.selectAll(".child")
+                .data(function(d) { return d.children || [d]; })
+              .enter().append("rect")
+                .attr("class", "child")
+                .style("fill", function(d) { return d.color; })
+                .call(rect);
 
-        g.append("rect")
-            .attr("class", "parent")
-            .call(rect)
-          .append("title")
-            .text(function(d) { return formatNumber(d.value); });
+            g.append("rect")
+                .attr("class", "parent")
+                .call(rect)
+              .append("title")
+                .text(function(d) { return formatNumber(d.value); });
 
-        g.append("text")
-            .attr("dy", ".75em")
-            .text(function(d) { return d.name; })
-            .call(text);
+            g.append("text")
+                .attr("dy", ".75em")
+                .text(function(d) { return d.name; })
+                .call(text);
 
-        function transition(d) {
-          if (transitioning || !d) return;
-          transitioning = true;
+            function transition(d) {
+              if (transitioning || !d) return;
+              transitioning = true;
 
-          var g2 = display(d),
-              t1 = g1.transition().duration(750),
-              t2 = g2.transition().duration(750);
+              var g2 = display(d),
+                  t1 = g1.transition().duration(750),
+                  t2 = g2.transition().duration(750);
 
-          // Update the domain only after entering new elements.
-          x.domain([d.x, d.x + d.dx]);
-          y.domain([d.y, d.y + d.dy]);
+              // Update the domain only after entering new elements.
+              x.domain([d.x, d.x + d.dx]);
+              y.domain([d.y, d.y + d.dy]);
 
-          // Enable anti-aliasing during the transition.
-          svg.style("shape-rendering", null);
+              // Enable anti-aliasing during the transition.
+              svg.style("shape-rendering", null);
 
-          // Draw child nodes on top of parent nodes.
-          svg.selectAll(".depth").sort(function(a, b) { return a.depth - b.depth; });
+              // Draw child nodes on top of parent nodes.
+              svg.selectAll(".depth").sort(function(a, b) { return a.depth - b.depth; });
 
-          // Fade-in entering text.
-          g2.selectAll("text").style("fill-opacity", 0);
+              // Fade-in entering text.
+              g2.selectAll("text").style("fill-opacity", 0);
 
-          // Transition to the new view.
-          t1.selectAll("text").call(text).style("fill-opacity", 0);
-          t2.selectAll("text").call(text).style("fill-opacity", 1);
-          t1.selectAll("rect").call(rect);
-          t2.selectAll("rect").call(rect);
+              // Transition to the new view.
+              t1.selectAll("text").call(text).style("fill-opacity", 0);
+              t2.selectAll("text").call(text).style("fill-opacity", 1);
+              t1.selectAll("rect").call(rect);
+              t2.selectAll("rect").call(rect);
 
-          // Remove the old node when the transition is finished.
-          t1.remove().each("end", function() {
-            svg.style("shape-rendering", "crispEdges");
-            transitioning = false;
-          });
-        }
+              // Remove the old node when the transition is finished.
+              t1.remove().each("end", function() {
+                svg.style("shape-rendering", "crispEdges");
+                transitioning = false;
+              });
+            }
 
-        return g;
+            return g;
         }
 
         function text(text) {

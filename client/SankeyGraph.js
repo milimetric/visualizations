@@ -89,16 +89,12 @@ function SankeyGraph(selector, uri){
     };
     
     function walkTree(node, nodes, links){
-        if (node.children) {
-            node.value = _.reduce(node.children.map(function(child){
-                return walkTree(child, nodes, links);
-            }), function (acc, val) { return acc + val; }, 0);
-        }
+        node.value = node.children ?
+            node.children.reduce(function(val, child){ return val + walkTree(child, nodes, links); }, 0) :
+            1;
         
         node.index = nodes.push(node) - 1;
-        if (!(node.value)) {
-            node.value = 1;
-        }
+        
         if (node.children) {
             node.children.map(function(child){
                 links.push({
