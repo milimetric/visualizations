@@ -1,0 +1,9 @@
+.treeMap .chart { width: 960px; height: 500px; background: #bbb; }
+.treeMap .chart text { pointer-events: none; }
+.treeMap .chart .grandparent text { font-weight: bold; }
+.treeMap .chart rect { fill: none; stroke: #fff; }
+.treeMap .chart rect.parent, .grandparent rect { stroke-width: 2px; }
+.treeMap .chart .grandparent rect { fill: #fff; }
+.treeMap .chart .children rect.parent, .grandparent rect { cursor: pointer; }
+.treeMap .chart rect.parent { pointer-events: all; }
+.treeMap .chart .children:hover rect.child, .grandparent:hover rect { fill: #aaa; }
