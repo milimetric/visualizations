@@ -1,0 +1,37 @@
+{
+   "nodes":[
+      { "name":"Awareness" },
+      { "name":"Ease of registration" },
+      { "name":"Motivation to join" },
+      { "name":"Acquisition" },
+      { "name":"Ease of editing" },
+      { "name":"Metoring/help" },
+      { "name":"Motivation incentives" },
+      { "name":"Serving tasks" },
+      { "name":"Conversion" },
+      { "name":"Ease of editing" },
+      { "name":"Collaborative community" },
+      { "name":"Motivation to continue" },
+      { "name":"Organizational issues" },
+      { "name":"Workload" },
+      { "name":"Retention" },
+      { "name":"Participation" }
+   ],
+   "links":[
+      { "source":0, "target":3, "value":3812 },
+      { "source":1, "target":3, "value":6715 },
+      { "source":2, "target":3, "value":743 },
+      { "source":4, "target":8, "value":3812 },
+      { "source":5, "target":8, "value":6713 },
+      { "source":6, "target":8, "value":743 },
+      { "source":7, "target":8, "value":6712 },
+      { "source":9, "target":14, "value":3812 },
+      { "source":10, "target":14, "value":6714 },
+      { "source":11, "target":14, "value":743 },
+      { "source":12, "target":14, "value":6711 },
+      { "source":13, "target":14, "value":6710 },
+      { "source":3, "target":15, "value":11270 },
+      { "source":8, "target":15, "value":17980 },
+      { "source":14, "target":15, "value":24690 }
+   ]
+}
