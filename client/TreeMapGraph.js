@@ -44,7 +44,9 @@ function TreeMapGraph(selector, uri){
         .attr("y", 6 - margin.top)
         .attr("dy", ".75em");
 
-    d3.json(uri, function(root) {
+    d3.json(uri, function(loaded) {
+        // var root = convertFromSankey(loaded);
+        var root = loaded;
 
         initialize(root);
         accumulate(root);
@@ -88,32 +90,17 @@ function TreeMapGraph(selector, uri){
             }
         }
 
-        function ColorLuminance(hex, lum) {
-            // validate hex string
-            hex = String(hex).replace(/[^0-9a-f]/gi, '');
-            if (hex.length < 6) {
-                hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-            }
-            lum = lum || 0;
-            // convert to decimal and change luminosity
-            var rgb = "#", c, i;
-            for (i = 0; i < 3; i++) {
-                c = parseInt(hex.substr(i*2,2), 16);
-                c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-                rgb += ("00"+c).substr(c.length);
-            }
-            return rgb;
-        }
-
         function colorize(d, parentColor) {
             if (d.children) {
-                lighterBy = 0.10;
-                d.children.forEach(function(c) {
+                lighterBy = 0.3;
+                d.children.sort(function(x, y){
+                    return y.value - x.value;
+                }).forEach(function(c) {
                     c.color = parentColor ?
-                        ColorLuminance(parentColor, lighterBy) :
+                        d3.rgb(parentColor).brighter(lighterBy) :
                         color(c.name);
                     
-                    lighterBy += 0.10;
+                    lighterBy += 0.3;
                     colorize(c, c.color);
                 });
             }
@@ -190,8 +177,7 @@ function TreeMapGraph(selector, uri){
               });
             }
 
-            return g;
-        }
+            return g; }
 
         function text(text) {
             text.attr("x", function(d) { return x(d.x) + 6; })
@@ -211,4 +197,8 @@ function TreeMapGraph(selector, uri){
             : d.name;
         }
     });
+
+    function convertFromSankey(graph){
+        return graph;
+    }
 }

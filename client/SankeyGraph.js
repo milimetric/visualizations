@@ -1,4 +1,3 @@
-console.log('loading sankey');
 function SankeyGraph(selector, uri){
 
     var margin = {top: 1, right: 1, bottom: 6, left: 1},
@@ -23,7 +22,8 @@ function SankeyGraph(selector, uri){
     var path = sankey.link();
 
     d3.json(uri, function(loaded) {
-        var energy = convertFromHierarchical(loaded);
+        // var energy = convertFromHierarchical(loaded);
+        var energy = loaded;
 
         sankey
             .nodes(energy.nodes)
@@ -82,10 +82,11 @@ function SankeyGraph(selector, uri){
         links = [];
         tree.value = walkTree(tree, nodes, links);
         
-        return {
-            nodes: nodes,
+        var forSankey = {
+            nodes: nodes.map(function(n){return {name: n.name};}),
             links: links
         };
+        return forSankey;
     };
     
     function walkTree(node, nodes, links){

@@ -6,7 +6,7 @@
             "name": "Acquisition",
             "children": [
                 {"name": "Awareness", "value": 3812},
-                {"name": "Ease of registration", "value": 6714},
+                {"name": "Ease of registration", "value": 6715},
                 {"name": "Motivation to join", "value": 743}
             ]
         },
@@ -14,9 +14,9 @@
             "name": "Conversion",
             "children": [
                 {"name": "Ease of editing", "value": 3812},
-                {"name": "Metoring/help", "value": 6714},
+                {"name": "Metoring/help", "value": 6713},
                 {"name": "Motivation incentives", "value": 743},
-                {"name": "Serving tasks", "value": 6714}
+                {"name": "Serving tasks", "value": 6712}
             ]
         },
         {
@@ -25,8 +25,8 @@
                 {"name": "Ease of editing", "value": 3812},
                 {"name": "Collaborative community", "value": 6714},
                 {"name": "Motivation to continue", "value": 743},
-                {"name": "Organizational issues", "value": 6714},
-                {"name": "Workload", "value": 6714}
+                {"name": "Organizational issues", "value": 6711},
+                {"name": "Workload", "value": 6710}
             ]
         }
     ]
