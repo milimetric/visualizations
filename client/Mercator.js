@@ -10,7 +10,7 @@ var countries = d3.select(selector)
   .append("g")
     .attr("id", "countries");
 
-d3.json("data/world-countries.json", function(collection) {
+d3.json("world-countries.json", function(collection) {
 
   countries
     .selectAll("path")
