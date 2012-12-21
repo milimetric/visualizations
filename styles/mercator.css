@@ -1,0 +1,24 @@
+body, .ui-widget {
+  font: 14px Helvetica Neue;
+}
+
+svg {
+  width: 960px;
+  height: 500px;
+  border: solid 1px #ccc;
+  background: #eee;
+}
+
+line {
+  stroke: brown;
+  stroke-dasharray: 4,2;
+}
+
+path {
+  fill: #ccc;
+  stroke: #fff;
+}
+
+div {
+  width: 960px;
+}
